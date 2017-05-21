@@ -5,3 +5,6 @@
 /01_sls_cli/net.o
 /01_sls_cli/noerr.o
 /01_sls_cli/aes
+/udp-ipv6-echo-server/libTI_aes.a
+/udp-ipv6-echo-server/aes.o
+/udp-ipv6-echo-server/libaes.a
