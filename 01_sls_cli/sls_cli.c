@@ -12,6 +12,7 @@ author Vo Que Son <sonvq@hcmut.edu.vn>
 #include <stdlib.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <sys/time.h>
 // #include "TI_aes.h"
 #include "sls.h"
 #define security_en (1)
@@ -42,7 +43,20 @@ static void print_cmd();
 static void prepare_cmd();
 static void prepare_encrypt();
 static void print_array(char* pstring, int length);
+struct timeval timer_usec; 
+long long int timestamp_usec;
 /*------------------------------------------------*/
+long long int display_time()
+{
+  if (!gettimeofday(&timer_usec, NULL)) {
+    timestamp_usec = ((long long int) timer_usec.tv_sec) * 1000000ll + 
+                        (long long int) timer_usec.tv_usec;
+  }
+  else {
+    timestamp_usec = -1;
+  }
+  return timestamp_usec;
+}
 void print_array(char* pstring, int length) {
 int i;
 for(i = 0; i < length; i += 8)
@@ -176,7 +190,8 @@ int main(int argc, char* argv[])
                       (struct sockaddr *)psinfo->ai_addr, sin6len);
    // status = sendto(sock, &tx_cmd, sizeof(tx_cmd), 0,
    //                    (struct sockaddr *)psinfo->ai_addr, sin6len);
-
+  timestamp_usec = display_time();
+  printf("time when sending command is %lld\n", timestamp_usec);
   printf("Send REQUEST (len=%d) to [%s]:%s\n",status, dst_ipv6addr,str_port);
   print_cmd(tx_cmd);
 
@@ -187,6 +202,8 @@ int main(int argc, char* argv[])
     exit(1);
   }
   else {
+    timestamp_usec = display_time();
+    printf("time when get respone is %lld\n", timestamp_usec);
     printf("Got REPLY (len=%d):\n",rev_bytes);   
     p = (char *) (&rev_buffer); 
     cmdPtr = (cmd_struct_t *)p;
