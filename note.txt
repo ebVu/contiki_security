@@ -1,0 +1,38 @@
+1. Build sls.c =>
+		1. Build aes.o: gcc aes.c -c -o aes -DCBC=0 -DEBC=1
+		2. Build sls_cli: gcc sls_cli.c aes.o -o sls_cli
+				  gcc sls_cli.c -pthread -lrt aes.o -o sls_cli
+		1. Build TI_aes.c: gcc -c TI_aes.c -o TI_aes.o
+		2. Build sls_cli: gcc sls_cli.c TI_aes.o -o sls_cli 
+2. cmd for sls_cli: 
+./sls_cli aaaa::212:400:5af:851f 3000 sls_led_on
+./sls_cli aaaa::c30c:0:0:2 3000 sls_led_on
+./sls_cli aaaa::212:7402:2:202 3000 sls_led_on
+
+3. Step of tmote sky library adding
+
+  Copy the example-broadcast.c
+  Copy the Makefile
+msp430-gcc -mmcu=msp430f1611 -c hello.c -o hello.o
+msp430-ar -cvq libhello.a hello.o
+add into makefile: TARGET_LIBFILES += -L. -lhello
+make example-broadcast TARGET=sky
+http://stackoverflow.com/questions/29971717/adding-my-own-library-to-contiki-os
+https://www.youtube.com/watch?v=csa9D1U5R_8
+
+msp430-gcc -mmcu=msp430f1611 -c aes.c -o aes.o
+msp430-ar -cvq libaes.a aes.o
+
+cd contiki -2.6/ tools
+make tunslip6
+sudo ./tunslip6 -a 127.0.0.1 aaaa::1/64
+add into makefile: TARGET_LIBFILES += -L. -lTI_aes
+
+------
+Issue 1: send cmd not reply
+Solution: reload cooja
+
+https://github.com/contiki-os/contiki/wiki/Using-Cooja-Test-Scripts-to-Automate-Simulations
+bash RUN_TEST mytest
+bash RUN_REPEATED 10 mytest
+
